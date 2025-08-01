@@ -1,244 +1,46 @@
-<img src="https://nititech.de/kosmo-header.png" style="width: 100%;" />
+# 🚨 Problema de Conexión en el Entorno de Desarrollo (Vite & Docker)
 
-<h1 style="margin-bottom:0">PHP-Vite Starter Repo <span style="font-size:1rem;">by <a href="https://nititech.de" target="_blank">nititech</a></span></h1>
+Este documento describe un problema común en entornos de desarrollo que combinan Laravel, Vite y Docker, y proporciona una guía detallada para su solución.
 
-php-vite-starter is a modern vanilla PHP-Vite starter repository designed to provide developers with the essential tools to kickstart their development of modern PHP applications.\
-This repository utilizes [Vite](https://vitejs.dev/) and the [`vite-plugin-php` plugin](https://github.com/donnikitos/vite-plugin-php) to improve developer experience and provide various features to streamline development.
+---
 
-## Features
+### Descripción del Problema
 
--   **Auto-refresh / auto-reloading**
--   **JS environmental variables in PHP**: Use environmental variables supplied in `.env` or to Vite in your PHP code.
--   **FastRoute router**: Fast and simple preconfigured router.
--   **TypeScript / JavaScript Transpilation**: Write modern JavaScript or TypeScript code, which will be automatically transpiled to browser-compatible JavaScript.
--   **Tailwind CSS Implementation**: Utilize Tailwind CSS for rapid UI development with utility-first classes.
--   **SASS / SCSS Support**: Write styles using SASS or SCSS syntax, with built-in support for compilation.
--   **EJS Template Language Support**: Use the EJS (Embedded JavaScript) templating language for using JavaScript pieces in your PHP-files.
--   **Image Transform Tools**: Easily manage and transform images as needed for your application.
--   **SVG Loader**: Load SVG files directly into your project, allowing for scalable vector graphics usage.
+Al ejecutar `npm run dev` para iniciar el servidor de desarrollo de Vite, se produce un error de conexión que impide que el frontend se comunique con el backend de Laravel. El error típico es el siguiente:
 
-## Usage
+Esto indica que el servidor de Vite no puede establecer una conexión con el servicio PHP-FPM, que es el que gestiona las peticiones de Laravel dentro de tu contenedor de Docker.
 
-1. **Clone the Repository**: Start by cloning this repository to your local machine.
+### Causa del Problema
 
-```bash
-git clone https://github.com/nititech/php-vite-starter.git
-```
+El error `Connection refused` (conexión rechazada) ocurre cuando un cliente (en este caso, el servidor de desarrollo de Vite que se ejecuta en tu máquina local) intenta conectarse a una dirección IP y puerto que no tiene un servicio activo escuchando peticiones.
 
-2. **Install Dependencies**: Navigate into the project directory and install the necessary dependencies using npm or yarn.
+La causa principal en este tipo de configuración es que el servicio PHP-FPM dentro del contenedor de Docker no es accesible desde el host (tu máquina local). Esto puede deberse a dos razones principales:
 
-```bash
-cd php-vite-starter
-npm install
-npm run composer install
-```
+1.  **Mapeo de Puertos Incorrecto:** El puerto de escucha del contenedor de PHP (normalmente el 9000) no está "mapeado" al puerto de tu máquina local en el archivo `docker-compose.yml`. Para que Vite pueda comunicarse con PHP, debe poder acceder al puerto 9000 de forma externa al contenedor.
 
-## Development
+2.  **Configuración de Host de PHP-FPM:** El servicio PHP-FPM está configurado para escuchar solo en `127.0.0.1` (localhost) dentro del contenedor, lo que impide que las conexiones externas (como las de Vite) lleguen a él. En entornos Docker, es necesario que escuche en `0.0.0.0` para aceptar conexiones de cualquier origen.
 
-3. Start the development server, just run the following command:
+### Solución Paso a Paso
 
-```bash
-npm run dev
-```
+Sigue estos pasos para diagnosticar y solucionar el problema:
 
-Now you can access your application. Once the server is running, you can access your application by navigating to http://localhost:3000/ in your web browser.
+#### Paso 1: Verificar el archivo `docker-compose.yml`
 
-## Project Structure
+Abre tu archivo `docker-compose.yml` y localiza el servicio `php`. Asegúrate de que el mapeo de puertos esté configurado correctamente para el puerto 9000.
 
-##### /bin
+Tu configuración de `php` debería verse similar a esto:
 
-```
-├── bin
-│   ├── composer.phar
-│   ├── **/*
-```
+```yaml
+version: '3.8'
 
--   This folder is supposed to hold binaries that are needed for project compilations and such
--   Currently holds only `composer.phar` for the `composer` command
-
-##### /index.php
-
-This is the app entry point ⚠️
-
--   Routing is now programmatic and uses [nikic' `FastRoute`](https://github.com/nikic/FastRoute) router -> for configuration see the `/configs/routes.php` file
--   Non-PHP files will not go through this router
--   Nonexisting files and paths will go through this router
-
-##### /configs
-
-```
-├── configs
-│   ├── env.php
-│   ├── routes.php
-│   ├── **/*
-```
-
--   `env.php` will be transpiled using Vite and the `vite-plugin-php` plugin -> here you can store tokens or other constants that should be reused through the app.\
-    We use it to define the constants that we import from Vite.
--   `routes.php` holds the routing configuration that is being used by FastRoute
-
-##### /pages
-
-```
-├── pages
-│   ├── **/*.php
-```
-
--   This `.php` files will be transpiled using Vite and the `vite-plugin-php` plugin
-
-##### /partials
-
-```
-├── partials
-│   ├── **/*.php
-```
-
--   Includable files (like components)
--   These `.php` files will be transpiled using Vite and the `vite-plugin-php` plugin
-
-##### /public
-
-```
-├── public
-│   ├── **/*
-```
-
--   Publicly accessible files should be placed here
--   Can be accessed by `/example-file.extension` in image, script, style, ... tags
--   Files will not be transpiled
-
-##### /raw
-
-```
-├── raw
-│   ├── .htaccess
-│   ├── **/*
-```
-
--   These files will be copied into the root of your build
--   Usually used for configurations, routers and so on (like the included `.htaccess`)
-
-##### /src
-
-```
-├── src
-│   ├── scripts
-│   │   ├── **/*
-│   ├── styles
-│   │   ├── **/*
-```
-
--   This folder should be used for files that need be handled by Vite
--   Files can be accessed for example by `/src/styles/example-style.scss` or `/src/scripts/some-script.ts`
-
-##### /system
-
-```
-├── system
-│   ├── **/*
-```
-
--   `.php` files in this folder will not be transpiled
--   Usually used for autoloaders, database connections etc.
-
-##### /vendor
-
-```
-├── vendor
-│   ├── **/*
-```
-
--   Vendor files installed by Composer
--   `.php` Files will not be transpiled
-
-## Production Build
-
-To generate a production build of your project, use:
-
-```bash
-npm run build
-```
-
-#### Output
-
-All files will be generated and copied into the `/dist` folder.
-
-```
-├── dist
-│   ├── configs (Files copied from the ./configs folder)
-│   │   ├── env.php (Transpiled to include environmental variables)
-│   │   ├── routes.php
-│   │   ├── **/*
-│   ├── pages
-│   │   ├── **/* (Transpiled PHP files from your ./pages folder)
-│   │
-│   ├── partials
-│   │   ├── **/* (Transpiled PHP files from your ./partials folder)
-│   │
-│   ├── public (Publicly accessible files, usually assets)
-│   │   ├── **/* (Files copied from the ./src/public folder)
-│   │
-│   ├── system
-│   │   ├── **/* (Files copied from the ./system folder)
-│   │
-│   ├── vendor
-│   │   ├── **/* (Files copied from the ./vendor folder, usually Composer packages)
-│   │
-│   ├── .htaccess
-│   ├── **/* (Files copied from the ./raw folder)
-```
-
-## Configuration
-
-This starter repository comes with default configurations for various tools. However, you can customize these configurations according to your project requirements. Key configuration files include:
-
--   **configs/routes.php**: Routing configuration.
--   **configs/env.php**: Globally accessible constants for PHP.
--   **tsconfig.json**: TypeScript configuration file. Modify this file to adjust TypeScript compiler options.
--   **.prettierrc**: Prettier configuration file for code formatting. Modify this file to customize code formatting rules.
--   **vite.config.ts**: Contains configuration settings for Vite, such as plugins, build options, and server settings.
--   **tailwind.config.ts**: Configuration file for Tailwind CSS. Customize this file to adjust Tailwind CSS settings.
--   **postcss.config.cjs**: Configuration for PostCSS, which is used for processing CSS. Modify this file to include additional PostCSS plugins or settings.
-
-## License
-
-This project is licensed under the MIT license, see LICENSE.
-
-## Contributing
-
-Contributions are welcome! If you have any suggestions, improvements, or bug fixes, please feel free to open an issue or submit a pull request.
-
-<table>
-	<tr>
-		<th>
-			via Ko-Fi
-		</th>
-		<th>
-			Buy me a coffee
-		</th>
-		<th>
-			via PayPal
-		</th>
-	</tr>
-	<tr>
-		<td>
-			<a href="https://ko-fi.com/Y8Y2ALMG" target="_blank">
-				<img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="ko-fi" width="174">
-			</a>
-		</td>
-		<td>
-			<a href="https://www.buymeacoffee.com/donnikitos" target="_blank">
-				<img src="https://nititech.de/donate-buymeacoffee.png" alt="Buy Me A Coffee" width="174">
-			</a>
-		</td>
-		<td>
-			<a href="https://www.paypal.com/donate/?hosted_button_id=EPXZPRTR7JHDW" target="_blank">
-				<img src="https://nititech.de/donate-paypal.png" alt="PayPal" width="174">
-			</a>
-		</td>
-	</tr>
-</table>
-
-## Acknowledgments
-
-Special thanks to the developers of Vite, Tailwind CSS, FastRoutes, and other tools used in this starter repository for their fantastic work.
+services:
+  # ... otros servicios
+  
+  php:
+    # ... otras configuraciones del servicio php
+    volumes:
+      - .:/var/www/html
+    # Línea crucial para permitir la conexión desde el host:
+    ports:
+      - "9000:9000"
+    # ... otras configuraciones
