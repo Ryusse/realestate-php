@@ -20,6 +20,9 @@ La causa principal en este tipo de configuración es que el servicio PHP-FPM den
 
 2.  **Configuración de Host de PHP-FPM:** El servicio PHP-FPM está configurado para escuchar solo en `127.0.0.1` (localhost) dentro del contenedor, lo que impide que las conexiones externas (como las de Vite) lleguen a él. En entornos Docker, es necesario que escuche en `0.0.0.0` para aceptar conexiones de cualquier origen.
 
+### Descargo de Responsabilidad
+Este proyecto es un entorno de desarrollo único con fines de aprendizaje. Su configuración y uso están optimizados para la exploración y el estudio de la integración entre Php, Vite y Docker. No está pensado para ser un entorno de producción o una plantilla de proyecto.
+
 ### Agradecimientos
 Este proyecto utiliza como base el "PHP-Vite Starter" de nititech. Un agradecimiento especial al creador por proporcionar un excelente punto de partida para proyectos que combinan PHP y Vite.
 

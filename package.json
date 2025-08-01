@@ -1,5 +1,5 @@
 {
-	"name": "php-vite-starter",
+	"name": "realestate_ai",
 	"description": "A modern vanilla PHP-Vite starter repo, utilizing vite-plugin-php",
 	"version": "1.0.0",
 	"type": "module",
