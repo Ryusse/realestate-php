@@ -20,27 +20,8 @@ La causa principal en este tipo de configuración es que el servicio PHP-FPM den
 
 2.  **Configuración de Host de PHP-FPM:** El servicio PHP-FPM está configurado para escuchar solo en `127.0.0.1` (localhost) dentro del contenedor, lo que impide que las conexiones externas (como las de Vite) lleguen a él. En entornos Docker, es necesario que escuche en `0.0.0.0` para aceptar conexiones de cualquier origen.
 
-### Solución Paso a Paso
+### Agradecimientos
+Este proyecto utiliza como base el "PHP-Vite Starter" de nititech. Un agradecimiento especial al creador por proporcionar un excelente punto de partida para proyectos que combinan PHP y Vite.
 
-Sigue estos pasos para diagnosticar y solucionar el problema:
-
-#### Paso 1: Verificar el archivo `docker-compose.yml`
-
-Abre tu archivo `docker-compose.yml` y localiza el servicio `php`. Asegúrate de que el mapeo de puertos esté configurado correctamente para el puerto 9000.
-
-Tu configuración de `php` debería verse similar a esto:
-
-```yaml
-version: '3.8'
-
-services:
-  # ... otros servicios
-  
-  php:
-    # ... otras configuraciones del servicio php
-    volumes:
-      - .:/var/www/html
-    # Línea crucial para permitir la conexión desde el host:
-    ports:
-      - "9000:9000"
-    # ... otras configuraciones
+Puedes encontrar el repositorio original aquí:
+https://github.com/nititech/php-vite-starter
