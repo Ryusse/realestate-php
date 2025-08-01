@@ -1,23 +1,12 @@
 {
 	"name": "realestate_ai",
-	"description": "A modern vanilla PHP-Vite starter repo, utilizing vite-plugin-php",
+	"description": "Real Estate AI",
 	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc --noEmit && vite build",
-    "install:app": "npm install && npm run docker:build && npm run install:composer && npm run setup:env",
-		"install:composer": "docker-compose exec php composer",
-		"install:composer2": "docker-compose exec php sh -c 'cd /var/www/html/ && composer install'",
-		"composer": "php ./bin/composer.phar",
-    "setup:env": "if not exist .env copy .env.example .env",
-		"docker:build": "docker-compose up -d --build",
-		"docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:restart": "docker-compose restart",
-    "docker:logs": "docker-compose logs -f",
-    "docker:exec-php": "docker-compose exec php bash",
-    "docker:exec-mysql": "docker-compose exec mysql bash"
+		"composer": "php ./bin/composer.phar"
 	},
 	"keywords": [
 		"php-vite-starter",
@@ -47,7 +36,7 @@
 		"email": "mail@nititech.de"
 	},
 	"author": {
-		"name": "nititech",
+		"name": "S",
 		"email": "mail@nititech.de",
 		"url": "https://nititech.de"
 	},

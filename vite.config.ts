@@ -9,89 +9,82 @@ import { existsSync } from 'node:fs';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig(({ command }) => {
-  const publicBasePath = '/php-vite-starter/';
-  const base = command === 'serve' ? '/' : publicBasePath;
-  const BASE = base.substring(0, base.length - 1);
+	const publicBasePath = '/realestate_ai/'; // Change if deploying under a nested public path. Needs to end with a /. See https://vitejs.dev/guide/build.html#public-base-path
 
-  return {
-    base,
-    plugins: [
-      imagetools(),
-      usePHP({
-        php: {
-            host: 'localhost:9000',
+	const base = command === 'serve' ? '/' : publicBasePath;
+	const BASE = base.substring(0, base.length - 1);
 
-        },
-        dev: {
-          cleanup: true,
-        },
-        entry: [
-          'index.php',
-          'configs/env.php',
-          'pages/**/*.php',
-          'partials/**/*.php',
-        ],
-        rewriteUrl(requestUrl) {
-          const filePath = fileURLToPath(
-            new URL('.' + requestUrl.pathname, import.meta.url),
-          );
-          const publicFilePath = fileURLToPath(
-            new URL(
-              './public' + requestUrl.pathname,
-              import.meta.url,
-            ),
-          );
+	return {
+		base,
+		plugins: [
+			imagetools(),
+			usePHP({
+				entry: [
+					'index.php',
+					'configs/env.php',
+					'pages/**/*.php',
+					'partials/**/*.php',
+				],
+				rewriteUrl(requestUrl) {
+					const filePath = fileURLToPath(
+						new URL('.' + requestUrl.pathname, import.meta.url),
+					);
+					const publicFilePath = fileURLToPath(
+						new URL(
+							'./public' + requestUrl.pathname,
+							import.meta.url,
+						),
+					);
 
-          if (
-            !requestUrl.pathname.includes('.php') &&
-            (existsSync(filePath) || existsSync(publicFilePath))
-          ) {
-            return undefined;
-          }
+					if (
+						!requestUrl.pathname.includes('.php') &&
+						(existsSync(filePath) || existsSync(publicFilePath))
+					) {
+						return undefined;
+					}
 
-          requestUrl.pathname = 'index.php';
+					requestUrl.pathname = 'index.php';
 
-          return requestUrl;
-        },
-      }),
-      ViteEjsPlugin({
-        BASE,
-      }),
-      viteStaticCopy({
-        targets: [
-          { src: 'public', dest: '' },
-          { src: 'system', dest: '' },
-          { src: 'configs', dest: '', overwrite: false },
-          { src: 'vendor', dest: '' },
-        ],
-        silent: command === 'serve',
-      }),
-      tailwindcss(),
-    ],
-    define: {
-      'BASE': JSON.stringify(BASE),
-      'import.meta.env.BASE': JSON.stringify(BASE),
-    },
-    resolve: {
-      alias: {
-        '~/': fileURLToPath(new URL('./src/', import.meta.url)),
-      },
-    },
-    publicDir: command === 'build' ? 'raw' : 'public',
-    css: {
-      preprocessorOptions: {
-        scss: {
-          api: 'modern-compiler',
-        },
-      },
-    },
-    server: {
-      host: "0.0.0.0",
-      port: 3000,
-    },
-    build: {
-      assetsDir: 'public',
-      emptyOutDir: true,
-    },
-  };
+					return requestUrl;
+				},
+			}),
+			ViteEjsPlugin({
+				BASE,
+			}),
+			viteStaticCopy({
+				targets: [
+					{ src: 'public', dest: '' },
+					{ src: 'system', dest: '' },
+					{ src: 'configs', dest: '', overwrite: false },
+					{ src: 'vendor', dest: '' },
+				],
+				silent: command === 'serve',
+			}),
+			tailwindcss(),
+		],
+		define: {
+			'BASE': JSON.stringify(BASE),
+			'import.meta.env.BASE': JSON.stringify(BASE),
+		},
+		resolve: {
+			alias: {
+				'~/': fileURLToPath(new URL('./src/', import.meta.url)),
+			},
+		},
+		publicDir: command === 'build' ? 'raw' : 'public',
+		css: {
+			preprocessorOptions: {
+				scss: {
+					api: 'modern-compiler',
+				},
+			},
+		},
+		server: {
+			port: 3000,
+		},
+		build: {
+			assetsDir: 'public',
+			emptyOutDir: true,
+		},
+	};
 });
