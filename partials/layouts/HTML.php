@@ -1,17 +1,20 @@
 <?php
-class HTML {
-	public function __construct(public string $title, public string $lang = 'en') {
+class HTML
+{
+	public function __construct(public string $title, public string $lang = 'en')
+	{
 		ob_start();
 	}
 
-	public function __destruct() {
+	public function __destruct()
+	{
 		$output = ob_get_clean();
 
 		ob_start();
-?>
+		?>
 
 		<!DOCTYPE html>
-		<html lang="<?= $this->lang; ?>">
+		<html lang="<?= $this->lang; ?>" class="bg-base-200">
 
 		<head>
 			<meta charset="UTF-8" />
@@ -24,13 +27,13 @@ class HTML {
 			<link href="/src/styles/global.scss" rel="stylesheet" />
 		</head>
 
-		<body class="w-screen h-screen flex items-center justify-center bg-neutral-50">
+		<body class="">
 			<?= $output; ?>
 		</body>
 
 		</html>
 
-<?php
+		<?php
 		die(ob_get_clean());
 	}
 }
