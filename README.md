@@ -1,5 +1,6 @@
 ---
-title: Documentación de proyecto PHP
+title: Proyecto php
+description: Esta es una página en mi sitio impulsado por Starlight
 ---
 
 # Plataforma de Búsqueda de Propiedades(MVP)
