@@ -1,3 +1,7 @@
+---
+title: Documentación de proyecto PHP
+---
+
 # Plataforma de Búsqueda de Propiedades(MVP)
 ## Descripción del MVP
 Este proyecto es el Producto Mínimo Viable (MVP) de una innovadora plataforma de búsqueda de propiedades que transforma la experiencia tradicional de encontrar tu hogar ideal. Mientras que los portales inmobiliarios convencionales se limitan a filtros estáticos, esta plataforma integra Inteligencia Artificial para entender no solo lo que buscas en una propiedad, sino cómo esa propiedad y su entorno se alinean con tu estilo de vida y tus preferencias implícitas.
